@@ -43,6 +43,12 @@ class Product(models.Model):
         'SKU 编号', max_length=50, unique=True,
         help_text='商品唯一标识, 如 P0001',
     )
+    # 条形码, 用于扫码入库; null=True 是可选唯一字段的公认写法
+    # (SQLite/MySQL8/PostgreSQL 的 unique 索引均允许多个 NULL, 兼容已有商品)
+    barcode = models.CharField(
+        '条形码', max_length=64, unique=True, null=True, blank=True,
+        help_text='用于扫码入库, 需全局唯一, 如 EAN-13 / 自定义编码',
+    )
     name = models.CharField('商品名称', max_length=100)
     category = models.ForeignKey(
         Category, on_delete=models.PROTECT,

@@ -26,11 +26,13 @@ class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
         fields = (
-            'sku', 'name', 'category', 'specification', 'unit',
+            'sku', 'barcode', 'name', 'category', 'specification', 'unit',
             'price', 'cost', 'safety_stock', 'image', 'remark', 'is_active',
         )
         widgets = {
             'sku': forms.TextInput(attrs={'class': 'form-control'}),
+            'barcode': forms.TextInput(
+                attrs={'class': 'form-control', 'placeholder': '扫码或输入条形码, 留空则不绑定'}),
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'category': forms.Select(attrs={'class': 'form-select'}),
             'specification': forms.TextInput(attrs={'class': 'form-control'}),

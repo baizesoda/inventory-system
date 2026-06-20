@@ -173,3 +173,57 @@ def check_create(request):
         return redirect('inventory:check_list')
     return render(request, 'inventory/check_form.html',
                   {'form': form, 'title': '新增盘点'})
+
+
+# ============== 扫码入库 ==============
+@editor_required
+def scan_inbound(request):
+    """扫码入库。
+
+    扫描/输入条码后自动带出商品信息, 在事务中将库存 +1, 并生成入库流水
+    与操作日志(与 record_create 保持一致的事务模式)。
+    """
+    product = None
+    barcode = request.POST.get('barcode', '').strip() if request.method == 'POST' else ''
+
+    if request.method == 'POST':
+        if not barcode:
+            messages.error(request, '请输入或扫描条码。')
+        else:
+            try:
+                matched = Product.objects.get(barcode=barcode)
+            except Product.DoesNotExist:
+                messages.error(request, f'未找到条码为 "{barcode}" 的商品。')
+            else:
+                if not matched.is_active:
+                    messages.error(
+                        request,
+                        f'商品 [{matched.sku}] {matched.name} 已停用, 无法入库。'
+                    )
+                else:
+                    with transaction.atomic():
+                        # 行锁, 避免并发覆盖; 与 record_create 保持一致
+                        product = Product.objects.select_for_update().get(pk=matched.pk)
+                        product.stock += 1
+                        product.save(update_fields=['stock', 'updated_at'])
+                        record = InOutRecord.objects.create(
+                            product=product,
+                            type='inbound',
+                            quantity=1,
+                            unit_price=product.cost,
+                            operator=request.user,
+                            remark='扫码入库',
+                        )
+                        _log(request, 'inbound',
+                             target=f'商品:{product.sku}',
+                             detail=f'扫码入库 +1, 流水 #{record.pk}')
+                    messages.success(
+                        request,
+                        f'入库成功: [{product.sku}] {product.name} +1, '
+                        f'当前库存 {product.stock}。'
+                    )
+
+    return render(request, 'inventory/scan_inbound.html', {
+        'product': product,
+        'barcode': barcode,
+    })

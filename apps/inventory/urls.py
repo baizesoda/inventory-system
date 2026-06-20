@@ -11,6 +11,8 @@ urlpatterns = [
     path('records/create/', views.record_create, name='record_create'),
     path('records/<int:pk>/', views.record_detail, name='record_detail'),
     path('records/<int:pk>/delete/', views.record_delete, name='record_delete'),
+    # 扫码入库
+    path('scan/inbound/', views.scan_inbound, name='scan_inbound'),
     # 盘点
     path('checks/', views.check_list, name='check_list'),
     path('checks/create/', views.check_create, name='check_create'),

@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% block title %}扫码入库{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <h4 class="mb-3"><i class="bi bi-upc-scan"></i> 扫码入库</h4>
+
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="alert alert-info py-2 mb-3">
+                    <i class="bi bi-info-circle"></i>
+                    输入或扫描商品条码后按回车, 系统自动带出商品信息并将库存 <strong>+1</strong>。
+                </div>
+                <form method="post" id="scan-form">
+                    {% csrf_token %}
+                    <div class="input-group input-group-lg">
+                        <span class="input-group-text"><i class="bi bi-upc-scan"></i></span>
+                        <input type="text" name="barcode" id="barcode-input" class="form-control"
+                            placeholder="请扫描或输入条形码" value="{{ barcode }}" autocomplete="off" autofocus required>
+                        <button class="btn btn-primary" type="submit">
+                            <i class="bi bi-box-arrow-in-down"></i> 入库
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {% if product %}
+        <!-- 自动带出的商品信息 -->
+        <div class="card border-success">
+            <div class="card-header bg-success text-white py-2">
+                <i class="bi bi-check-circle-fill"></i>
+                已入库 &middot; [{{ product.sku }}]
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h5 class="mb-2">{{ product.name }}</h5>
+                        <ul class="list-unstyled small mb-0">
+                            <li class="mb-1">
+                                <span class="text-muted">条形码:</span>
+                                <code>{{ product.barcode|default:"未绑定" }}</code>
+                            </li>
+                            <li class="mb-1">
+                                <span class="text-muted">分类:</span>
+                                {{ product.category.name }}
+                            </li>
+                            <li class="mb-1">
+                                <span class="text-muted">规格 / 单位:</span>
+                                {{ product.specification|default:"-" }} / {{ product.unit }}
+                            </li>
+                            <li class="mb-1">
+                                <span class="text-muted">单价 / 成本:</span>
+                                ¥{{ product.price }} / ¥{{ product.cost }}
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div
+                            class="border rounded-3 py-3 {% if product.is_low_stock %}bg-warning bg-opacity-25{% endif %}">
+                            <div class="text-muted small">当前库存</div>
+                            <div
+                                class="display-6 fw-bold {% if product.is_low_stock %}text-warning{% else %}text-success{% endif %}">
+                                {{ product.stock }}
+                            </div>
+                            <div class="small">
+                                {% if product.is_low_stock %}
+                                <i class="bi bi-exclamation-triangle"></i> 低于安全库存 {{ product.safety_stock }}
+                                {% else %}
+                                安全库存 {{ product.safety_stock }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-3">
+            <a href="{% url 'inventory:scan_inbound' %}" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-repeat"></i> 继续扫码
+            </a>
+            <a href="{% url 'inventory:record_list' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-list-ul"></i> 查看流水
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    // 入库完成后清空输入框并重新聚焦, 方便连续扫码
+    document.addEventListener('DOMContentLoaded', function () {
+        var input = document.getElementById('barcode-input');
+        {% if product %}
+        if (input) { input.value = ''; }
+        {% endif %}
+        if (input) { input.focus(); }
+    });
+</script>
+{% endblock %}
