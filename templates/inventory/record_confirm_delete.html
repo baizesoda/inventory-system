@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}撤销流水{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white"><i class="bi bi-exclamation-triangle"></i> 确认撤销流水</div>
+            <div class="card-body">
+                <p>您即将撤销 <strong>{{ record.get_type_display }}</strong> 流水 #{{ record.pk }}。</p>
+                <p>商品: <code>{{ record.product.sku }}</code> {{ record.product.name }}, 数量 {{ record.quantity }}。</p>
+                <p class="text-warning">撤销后, 商品库存将反向调整回原值。</p>
+                <form method="post">
+                    {% csrf_token %}
+                    <a href="{% url 'inventory:record_list' %}" class="btn btn-secondary">取消</a>
+                    <button type="submit" class="btn btn-danger"><i class="bi bi-arrow-counterclockwise"></i> 确认撤销</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}个人资料{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <h4 class="mb-3"><i class="bi bi-person"></i> 个人资料</h4>
+        <div class="card">
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row mb-3">
+                        <label class="col-sm-3 col-form-label">用户名</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" value="{{ request.user.username }}" disabled>
+                            <div class="form-text">用户名不可修改</div>
+                        </div>
+                    </div>
+                    {% for field in form %}
+                    <div class="row mb-3">
+                        <label class="col-sm-3 col-form-label">{{ field.label }}</label>
+                        <div class="col-sm-9">
+                            {{ field }}
+                            {% if field.errors %}<div class="text-danger small">{{ field.errors }}</div>{% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <div class="row mb-3">
+                        <label class="col-sm-3 col-form-label">当前角色</label>
+                        <div class="col-sm-9">
+                            <span class="badge bg-info fs-6">{{ profile.get_role_display }}</span>
+                            <div class="form-text">如需更改角色, 请联系系统管理员。</div>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <button class="btn btn-primary"><i class="bi bi-save"></i> 保存修改</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

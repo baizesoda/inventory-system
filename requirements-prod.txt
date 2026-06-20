@@ -1,0 +1,10 @@
+# ============== 生产环境额外依赖(MySQL 支持) ==============
+# 使用方法:
+#   pip install -r requirements.txt -r requirements-prod.txt
+#
+# 安装前请确保系统已安装 MySQL 客户端开发库:
+#   Ubuntu/Debian: sudo apt install default-libmysqlclient-dev pkg-config
+#   CentOS/RHEL:   sudo yum install mysql-devel
+#   macOS:          brew install mysql-client pkg-config && export PKG_CONFIG_PATH="$(brew --prefix)/opt/mysql-client/lib/pkgconfig"
+
+mysqlclient==2.2.4

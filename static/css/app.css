@@ -1,0 +1,32 @@
+/* 全站自定义样式 */
+body {
+    background-color: #f5f6fa;
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.navbar-brand { letter-spacing: 1px; }
+
+/* KPI 卡片悬浮效果 */
+.kpi-card {
+    transition: transform .2s, box-shadow .2s;
+    border-left: 4px solid #0d6efd;
+}
+.kpi-card:hover { transform: translateY(-3px); box-shadow: 0 .5rem 1rem rgba(0,0,0,.1); }
+.kpi-card.success { border-left-color: #198754; }
+.kpi-card.warning { border-left-color: #ffc107; }
+.kpi-card.danger  { border-left-color: #dc3545; }
+
+.kpi-value { font-size: 2rem; font-weight: 600; line-height: 1.2; }
+.kpi-label { color: #6c757d; font-size: .9rem; }
+
+/* 低库存行高亮 */
+tr.low-stock { background-color: #fff3cd; }
+
+/* 登录页背景 */
+.login-bg {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+/* 空状态占位 */
+.empty-state { color: #adb5bd; padding: 3rem 0; text-align: center; }

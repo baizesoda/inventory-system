@@ -1,0 +1,12 @@
+# ============== 库存管理系统 Python 依赖 ==============
+# 开发环境(SQLite)只需安装本文件中的依赖;
+# 生产环境(MySQL)请额外安装:
+#   - 系统包: default-libmysqlclient-dev / pkg-config (Ubuntu/Debian)
+#             mysql-devel (CentOS)
+#             mysql-client (macOS: brew install mysql-client pkg-config)
+#   - 然后: pip install mysqlclient==2.2.4
+
+Django==5.0.6
+gunicorn==22.0.0
+Pillow==10.3.0
+python-dotenv==1.0.1

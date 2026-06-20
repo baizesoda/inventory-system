@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% block title %}{{ product.name }} - 商品详情{% endblock %}
+{% load humanize %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0"><i class="bi bi-box"></i> {{ product.name }}</h4>
+    <div>
+        <a href="{% url 'products:list' %}" class="btn btn-secondary btn-sm">返回列表</a>
+        {% if request.user.profile.can_edit %}
+        <a href="{% url 'products:update' product.pk %}" class="btn btn-warning btn-sm">
+            <i class="bi bi-pencil"></i> 编辑</a>
+        <a href="{% url 'products:delete' product.pk %}" class="btn btn-danger btn-sm">
+            <i class="bi bi-trash"></i> 删除</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" class="img-fluid rounded" style="max-height:240px;">
+                {% else %}
+                <div class="py-5 text-muted">
+                    <i class="bi bi-image" style="font-size:4rem;"></i>
+                    <p class="small mt-2">暂无图片</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card mb-3">
+            <div class="card-header">基本信息</div>
+            <div class="card-body">
+                <table class="table table-borderless mb-0">
+                    <tr><th class="w-25">SKU 编号</th><td><code>{{ product.sku }}</code></td></tr>
+                    <tr><th>分类</th><td><span class="badge bg-secondary">{{ product.category.name }}</span></td></tr>
+                    <tr><th>规格型号</th><td>{{ product.specification|default:'-' }}</td></tr>
+                    <tr><th>计量单位</th><td>{{ product.unit }}</td></tr>
+                    <tr><th>销售单价</th><td class="fw-bold text-primary">¥ {{ product.price|floatformat:2|intcomma }}</td></tr>
+                    <tr><th>成本单价</th><td>¥ {{ product.cost|floatformat:2|intcomma }}</td></tr>
+                    <tr><th>当前库存</th>
+                        <td>
+                            <span class="fs-5 {% if product.is_low_stock %}text-danger fw-bold{% endif %}">{{ product.stock }} {{ product.unit }}</span>
+                            {% if product.is_low_stock %}
+                            <span class="badge bg-warning ms-2">低于警戒线</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr><th>安全库存</th><td>{{ product.safety_stock }} {{ product.unit }}</td></tr>
+                    <tr><th>库存价值</th><td>¥ {{ product.stock_value|floatformat:2|intcomma }}</td></tr>
+                    <tr><th>状态</th>
+                        <td>{% if product.is_active %}
+                            <span class="badge bg-success">在用</span>
+                            {% else %}<span class="badge bg-secondary">停用</span>{% endif %}</td></tr>
+                    <tr><th>备注</th><td>{{ product.remark|default:'-'|linebreaksbr }}</td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header"><i class="bi bi-clock-history"></i> 最近出入库流水(20 条)</div>
+    <div class="card-body p-0">
+        <table class="table table-sm mb-0">
+            <thead class="table-light">
+                <tr><th>时间</th><th>类型</th><th class="text-end">数量</th>
+                    <th class="text-end">单价</th><th>操作人</th><th>备注</th></tr>
+            </thead>
+            <tbody>
+                {% for r in records %}
+                <tr>
+                    <td>{{ r.created_at|date:"Y-m-d H:i" }}</td>
+                    <td>
+                        {% if r.type == 'inbound' %}
+                        <span class="badge bg-success">入库</span>
+                        {% else %}
+                        <span class="badge bg-danger">出库</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">{{ r.quantity }}</td>
+                    <td class="text-end">¥ {{ r.unit_price|floatformat:2 }}</td>
+                    <td>{{ r.operator|default:'-' }}</td>
+                    <td>{{ r.remark|default:'-' }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="empty-state">该商品暂无出入库记录</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

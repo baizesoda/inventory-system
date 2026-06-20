@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}删除分类{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">确认删除分类</div>
+            <div class="card-body">
+                <p>您即将删除分类 <strong>{{ category.name }}</strong>({{ category.code }})。</p>
+                <form method="post">
+                    {% csrf_token %}
+                    <a href="{% url 'products:category_list' %}" class="btn btn-secondary">取消</a>
+                    <button type="submit" class="btn btn-danger"><i class="bi bi-trash"></i> 确认删除</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

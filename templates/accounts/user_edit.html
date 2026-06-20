@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}编辑用户{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <h4 class="mb-3"><i class="bi bi-person-gear"></i> 编辑用户 - {{ target_user.username }}</h4>
+        <div class="card">
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div class="mb-3 row">
+                        <label class="col-sm-3 col-form-label">{{ field.label }}</label>
+                        <div class="col-sm-9">
+                            {{ field }}
+                            {% if field.errors %}<div class="text-danger small">{{ field.errors }}</div>{% endif %}
+                            {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <div class="text-end">
+                        <a href="{% url 'accounts:user_list' %}" class="btn btn-secondary">取消</a>
+                        <button class="btn btn-primary"><i class="bi bi-save"></i> 保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,36 @@
+# ============== Python ==============
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.installed.cfg
+*.egg
+venv/
+env/
+.venv/
+
+# ============== Django ==============
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+local_settings.py
+
+# ============== 环境与密钥 ==============
+.env
+*.pem
+*.key
+
+# ============== IDE ==============
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# ============== 日志 ==============
+*.log
+logs/
+gunicorn-access.log
+gunicorn-error.log

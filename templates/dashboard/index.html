@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% block title %}数据看板 - 库存管理系统{% endblock %}
+{% load humanize %}
+
+{% block content %}
+<h4 class="mb-4"><i class="bi bi-speedometer2"></i> 数据看板</h4>
+
+<!-- KPI 卡片 -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card kpi-card h-100">
+            <div class="card-body">
+                <div class="kpi-label">在用商品总数</div>
+                <div class="kpi-value text-primary">{{ kpis.total_products }}</div>
+                <div class="text-muted small">个 SKU</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card kpi-card success h-100">
+            <div class="card-body">
+                <div class="kpi-label">库存总价值(成本)</div>
+                <div class="kpi-value text-success">¥ {{ kpis.total_stock_value|floatformat:2|intcomma }}</div>
+                <div class="text-muted small">元</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card kpi-card h-100">
+            <div class="card-body">
+                <div class="kpi-label">今日入库</div>
+                <div class="kpi-value text-info">{{ kpis.today_in }}</div>
+                <div class="text-muted small">件</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card kpi-card warning h-100">
+            <div class="card-body">
+                <div class="kpi-label">今日出库</div>
+                <div class="kpi-value text-warning">{{ kpis.today_out }}</div>
+                <div class="text-muted small">件</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <!-- 趋势图 -->
+    <div class="col-lg-8">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-graph-up"></i> 近 30 天出入库趋势</span>
+                <select id="trend-days" class="form-select form-select-sm" style="width:auto;">
+                    <option value="7">近 7 天</option>
+                    <option value="30" selected>近 30 天</option>
+                    <option value="90">近 90 天</option>
+                </select>
+            </div>
+            <div class="card-body">
+                <canvas id="trendChart" height="120"></canvas>
+            </div>
+        </div>
+    </div>
+    <!-- 分类饼图 -->
+    <div class="col-lg-4">
+        <div class="card h-100">
+            <div class="card-header"><i class="bi bi-pie-chart"></i> 分类商品数量分布</div>
+            <div class="card-body">
+                <canvas id="categoryChart" height="160"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mt-1">
+    <!-- 低库存预警 -->
+    <div class="col-lg-7">
+        <div class="card h-100">
+            <div class="card-header bg-warning-subtle">
+                <i class="bi bi-exclamation-triangle"></i> 低库存预警(TOP 10)
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>SKU</th><th>商品名称</th>
+                            <th class="text-end">当前库存</th>
+                            <th class="text-end">警戒线</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for p in low_stock_products %}
+                        <tr class="low-stock">
+                            <td>{{ p.sku }}</td>
+                            <td><a href="{% url 'products:detail' p.pk %}">{{ p.name }}</a></td>
+                            <td class="text-end text-danger fw-bold">{{ p.stock }}</td>
+                            <td class="text-end">{{ p.safety_stock }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="4" class="empty-state">没有低库存商品, 一切正常 ✅</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- 最近操作 -->
+    <div class="col-lg-5">
+        <div class="card h-100">
+            <div class="card-header"><i class="bi bi-activity"></i> 最近操作</div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    {% for log in recent_logs %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        <div>
+                            <span class="badge bg-secondary">{{ log.get_action_display }}</span>
+                            <span class="ms-2">{{ log.target }}</span>
+                            <div class="text-muted small">{{ log.user|default:"系统" }}</div>
+                        </div>
+                        <span class="text-muted small">{{ log.created_at|timesince }} 前</span>
+                    </li>
+                    {% empty %}
+                        <li class="list-group-item empty-state">暂无操作记录</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// 出入库趋势折线图
+const trendCtx = document.getElementById('trendChart').getContext('2d');
+const trendData = JSON.parse('{{ trend_json|escapejs }}');
+
+function renderTrendChart(data) {
+    return new Chart(trendCtx, {
+        type: 'line',
+        data: {
+            labels: data.days,
+            datasets: [
+                {label: '入库', data: data.in_qty, borderColor: '#198754',
+                 backgroundColor: 'rgba(25,135,84,.1)', fill: true, tension: .3},
+                {label: '出库', data: data.out_qty, borderColor: '#dc3545',
+                 backgroundColor: 'rgba(220,53,69,.1)', fill: true, tension: .3},
+            ]
+        },
+        options: {responsive: true, maintainAspectRatio: false}
+    });
+}
+let trendChart = renderTrendChart(trendData);
+
+// 切换时间范围
+document.getElementById('trend-days').addEventListener('change', async (e) => {
+    const days = e.target.value;
+    const resp = await fetch(`{% url 'dashboard:trend_api' %}?days=${days}`);
+    const data = await resp.json();
+    trendChart.destroy();
+    trendChart = renderTrendChart(data);
+});
+
+// 分类饼图
+const catLabels = [{% for c in category_dist %}"{{ c.name }}"{% if not forloop.last %},{% endif %}{% endfor %}];
+const catData = [{% for c in category_dist %}{{ c.product_count|default:0 }}{% if not forloop.last %},{% endif %}{% endfor %}];
+new Chart(document.getElementById('categoryChart').getContext('2d'), {
+    type: 'doughnut',
+    data: {labels: catLabels,
+           datasets: [{data: catData, backgroundColor: [
+               '#0d6efd', '#198754', '#ffc107', '#dc3545', '#6610f2',
+               '#20c997', '#fd7e14', '#d63384', '#0dcaf0'
+           ]}]},
+    options: {responsive: true, maintainAspectRatio: false}
+});
+</script>
+{% endblock %}
