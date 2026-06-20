@@ -1,42 +1,209 @@
-{% extends 'base.html' %}
-{% block title %}登录 - 库存管理系统{% endblock %}
-{% block content %}
-<div class="row justify-content-center mt-5">
-    <div class="col-md-5 col-lg-4">
-        <div class="card shadow">
-            <div class="card-body p-4">
-                <h3 class="text-center mb-4">
-                    <i class="bi bi-box-seam text-primary"></i> 库存管理系统
-                </h3>
-                <form method="post">
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - 库存管理系统</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="{% static 'css/app.css' %}" rel="stylesheet">
+</head>
+
+<body class="login-page">
+
+    <div class="login-wrapper">
+        <!-- 左侧: 品牌展示区 -->
+        <aside class="login-hero">
+            <div class="login-hero-content">
+                <a class="login-brand" href="{% url 'accounts:login' %}">
+                    <span class="login-brand-mark">
+                        <svg viewBox="0 0 48 48" width="34" height="34" aria-hidden="true">
+                            <defs>
+                                <linearGradient id="lg-mark" x1="0" y1="0" x2="1" y2="1">
+                                    <stop offset="0" stop-color="#ffd75e" />
+                                    <stop offset="1" stop-color="#ffb732" />
+                                </linearGradient>
+                            </defs>
+                            <path d="M24 4 42 13v22L24 44 6 35V13z" fill="rgba(255,255,255,.12)"
+                                stroke="rgba(255,255,255,.55)" stroke-width="1.5" />
+                            <path d="M24 4 42 13 24 22 6 13z" fill="url(#lg-mark)" />
+                            <path d="M6 13l18 9 18-9v22l-18 9-18-9z" fill="none" stroke="rgba(255,255,255,.35)"
+                                stroke-width="1" />
+                            <path d="M24 22v22" stroke="rgba(255,255,255,.35)" stroke-width="1" />
+                        </svg>
+                    </span>
+                    <span class="login-brand-text">库存管理系统</span>
+                </a>
+
+                <!-- 仓库主题插画 -->
+                <div class="login-illustration">
+                    <svg viewBox="0 0 520 360" width="100%" role="img" aria-label="仓库管理插画">
+                        <defs>
+                            <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0" stop-color="#ffffff" stop-opacity=".25" />
+                                <stop offset="1" stop-color="#ffffff" stop-opacity="0" />
+                            </linearGradient>
+                            <linearGradient id="box1" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0" stop-color="#ffd75e" />
+                                <stop offset="1" stop-color="#f0a020" />
+                            </linearGradient>
+                            <linearGradient id="box2" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0" stop-color="#8ea8ff" />
+                                <stop offset="1" stop-color="#5d7ce0" />
+                            </linearGradient>
+                            <linearGradient id="box3" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0" stop-color="#b98bff" />
+                                <stop offset="1" stop-color="#8a5ee0" />
+                            </linearGradient>
+                        </defs>
+
+                        <!-- 地面投影 -->
+                        <ellipse cx="260" cy="312" rx="220" ry="26" fill="url(#floor)" />
+
+                        <!-- 左侧货架 -->
+                        <g>
+                            <rect x="60" y="120" width="150" height="170" rx="6" fill="rgba(255,255,255,.10)"
+                                stroke="rgba(255,255,255,.35)" stroke-width="2" />
+                            <line x1="60" y1="178" x2="210" y2="178" stroke="rgba(255,255,255,.3)" stroke-width="2" />
+                            <line x1="60" y1="236" x2="210" y2="236" stroke="rgba(255,255,255,.3)" stroke-width="2" />
+                            <!-- 货架上的箱子 -->
+                            <rect x="74" y="132" width="50" height="40" rx="4" fill="url(#box1)" />
+                            <rect x="130" y="132" width="50" height="40" rx="4" fill="url(#box2)" />
+                            <rect x="186" y="138" width="18" height="34" rx="3" fill="url(#box3)" />
+                            <rect x="74" y="190" width="40" height="40" rx="4" fill="url(#box3)" />
+                            <rect x="120" y="190" width="56" height="40" rx="4" fill="url(#box1)" />
+                            <rect x="182" y="196" width="22" height="34" rx="3" fill="url(#box2)" />
+                            <rect x="80" y="248" width="60" height="36" rx="4" fill="url(#box2)" />
+                            <rect x="146" y="248" width="56" height="36" rx="4" fill="url(#box3)" />
+                        </g>
+
+                        <!-- 右侧堆叠箱 + 平板 -->
+                        <g>
+                            <!-- 大箱 -->
+                            <rect x="320" y="196" width="120" height="94" rx="6" fill="url(#box1)" />
+                            <rect x="320" y="196" width="120" height="22" rx="6" fill="rgba(255,255,255,.22)" />
+                            <line x1="380" y1="196" x2="380" y2="290" stroke="rgba(0,0,0,.08)" stroke-width="2" />
+                            <!-- 小箱 -->
+                            <rect x="346" y="150" width="74" height="46" rx="5" fill="url(#box2)" />
+                            <rect x="346" y="150" width="74" height="14" rx="5" fill="rgba(255,255,255,.22)" />
+                            <!-- 平板 -->
+                            <rect x="300" y="250" width="92" height="62" rx="8" fill="#ffffff" />
+                            <rect x="308" y="258" width="76" height="46" rx="3" fill="#5d7ce0" />
+                            <rect x="314" y="266" width="40" height="5" rx="2" fill="rgba(255,255,255,.85)" />
+                            <rect x="314" y="276" width="58" height="4" rx="2" fill="rgba(255,255,255,.55)" />
+                            <rect x="314" y="285" width="30" height="4" rx="2" fill="rgba(255,255,255,.55)" />
+                            <circle cx="376" cy="296" r="3" fill="rgba(255,255,255,.7)" />
+                        </g>
+
+                        <!-- 飘浮的小箱子 / 装饰 -->
+                        <g opacity=".95">
+                            <rect x="252" y="92" width="38" height="30" rx="4" fill="url(#box3)"
+                                transform="rotate(-8 271 107)" />
+                            <rect x="252" y="92" width="38" height="9" rx="3" fill="rgba(255,255,255,.3)"
+                                transform="rotate(-8 271 107)" />
+                            <rect x="438" y="120" width="30" height="24" rx="3" fill="url(#box1)"
+                                transform="rotate(10 453 132)" />
+                            <circle cx="230" cy="78" r="6" fill="#ffd75e" />
+                            <circle cx="470" cy="86" r="4" fill="#ffffff" opacity=".7" />
+                            <circle cx="300" cy="60" r="3" fill="#ffffff" opacity=".6" />
+                        </g>
+
+                        <!-- 移动小车 -->
+                        <g>
+                            <rect x="210" y="288" width="76" height="20" rx="4" fill="rgba(255,255,255,.25)"
+                                stroke="rgba(255,255,255,.5)" stroke-width="1.5" />
+                            <circle cx="226" cy="312" r="7" fill="#2d2150" />
+                            <circle cx="270" cy="312" r="7" fill="#2d2150" />
+                            <circle cx="226" cy="312" r="3" fill="#ffd75e" />
+                            <circle cx="270" cy="312" r="3" fill="#ffd75e" />
+                        </g>
+                    </svg>
+                </div>
+
+                <div class="login-hero-text">
+                    <h1>高效、智能的<br>库存管理平台</h1>
+                    <p>商品、出入库、盘点、数据看板，一站式管理</p>
+                    <ul class="login-features">
+                        <li><i class="bi bi-box-seam"></i> 商品与分类管理</li>
+                        <li><i class="bi bi-arrow-left-right"></i> 出入库全流程记录</li>
+                        <li><i class="bi bi-clipboard-check"></i> 定期盘点与预警</li>
+                        <li><i class="bi bi-graph-up"></i> 实时数据看板</li>
+                    </ul>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 右侧: 登录表单 -->
+        <main class="login-form-side">
+            <div class="login-form-card">
+                <div class="login-logo">
+                    <svg viewBox="0 0 64 64" width="60" height="60" aria-hidden="true">
+                        <defs>
+                            <linearGradient id="logo-grad" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0" stop-color="#667eea" />
+                                <stop offset="1" stop-color="#764ba2" />
+                            </linearGradient>
+                        </defs>
+                        <rect x="6" y="6" width="52" height="52" rx="14" fill="url(#logo-grad)" />
+                        <path d="M32 16 48 24v16L32 48 16 40V24z" fill="rgba(255,255,255,.18)" stroke="#fff"
+                            stroke-width="2" />
+                        <path d="M32 16 48 24 32 32 16 24z" fill="#ffd75e" />
+                        <path d="M16 24l16 8 16-8v16l-16 8-16-8z" fill="none" stroke="#fff" stroke-width="1.5" />
+                    </svg>
+                </div>
+                <h2 class="login-title">欢迎回来</h2>
+                <p class="login-subtitle">登录以继续使用库存管理系统</p>
+
+                <form method="post" class="login-form">
                     {% csrf_token %}
                     {% if form.non_field_errors %}
-                        <div class="alert alert-danger py-2">
-                            {{ form.non_field_errors }}
-                        </div>
+                    <div class="alert alert-danger py-2">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        {{ form.non_field_errors }}
+                    </div>
                     {% endif %}
-                    <div class="mb-3">
-                        <label class="form-label">{{ form.username.label }}</label>
+                    <div class="form-floating mb-3">
                         {{ form.username }}
+                        <label for="{{ form.username.id_for_label }}">
+                            <i class="bi bi-person"></i> {{ form.username.label }}
+                        </label>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">{{ form.password.label }}</label>
+                    <div class="form-floating mb-3">
                         {{ form.password }}
+                        <label for="{{ form.password.id_for_label }}">
+                            <i class="bi bi-lock"></i> {{ form.password.label }}
+                        </label>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">
+                    <button type="submit" class="btn btn-primary w-100 btn-lg login-submit">
                         <i class="bi bi-box-arrow-in-right"></i> 登录
                     </button>
                 </form>
-                <hr>
-                <div class="text-center small">
+
+                <div class="login-divider"><span>或</span></div>
+
+                <div class="login-alt">
                     没有账号? <a href="{% url 'accounts:register' %}">立即注册</a>
                 </div>
-                <div class="text-center text-muted small mt-3">
-                    <p class="mb-1">演示账号 (首次启动后由初始化脚本创建):</p>
-                    <code>admin / admin123</code> · <code>keeper / keeper123</code> · <code>viewer / viewer123</code>
+
+                <div class="login-demo">
+                    <p><i class="bi bi-info-circle"></i> 演示账号 (首次启动后由初始化脚本创建):</p>
+                    <div class="login-demo-chips">
+                        <code>admin / admin123</code>
+                        <code>keeper / keeper123</code>
+                        <code>viewer / viewer123</code>
+                    </div>
                 </div>
             </div>
-        </div>
+            <p class="login-foot">库存管理系统 v1.0 &middot; 基于 Django All-in-One 架构</p>
+        </main>
     </div>
-</div>
-{% endblock %}
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
