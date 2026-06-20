@@ -23,7 +23,8 @@ SECRET_KEY = os.environ.get(
     'django-insecure-please-change-this-key-in-production-env'
 )
 # 调试模式, 生产环境必须为 False
-DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() == 'true'
+# 默认 False(生产安全); 本地开发时设置环境变量 DJANGO_DEBUG=True 可重新开启
+DEBUG = os.environ.get('DJANGO_DEBUG', 'False').lower() == 'true'
 # 允许访问的主机, 生产环境请改为实际域名或 IP
 ALLOWED_HOSTS = ['*']
 
