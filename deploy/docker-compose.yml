@@ -3,8 +3,6 @@
 #   开发环境: docker compose up -d
 #   生产环境: 先准备 .env 文件, 再执行 docker compose --env-file .env up -d
 
-version: '3.8'
-
 services:
   # ---------- 数据库(MySQL 8.0) ----------
   db:
@@ -51,14 +49,9 @@ services:
       - media_files:/app/media
     expose:
       - "8000"
-    # 启动前执行迁移 + 初始化演示数据(首次)
-    command: >
-      sh -c "python manage.py migrate --noinput &&
-             python manage.py init_demo &&
-             python manage.py collectstatic --noinput &&
-             gunicorn --bind 0.0.0.0:8000 --workers 3
-                    --config deploy/gunicorn.conf.py
-                    inventory_system.wsgi:application"
+    # 启动前执行迁移 + 初始化演示数据(首次), 然后用 Gunicorn 提供服务
+    # 使用 exec 列表形式, 避免 YAML 折叠标量把多行命令拆断
+    command: ["sh", "-c", "python manage.py migrate --noinput && python manage.py init_demo && python manage.py collectstatic --noinput && gunicorn --bind 0.0.0.0:8000 --workers 3 --config deploy/gunicorn.conf.py inventory_system.wsgi:application"]
 
   # ---------- Nginx 反向代理 ----------
   nginx:
